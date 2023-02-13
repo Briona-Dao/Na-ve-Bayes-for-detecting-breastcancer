@@ -1,0 +1,100 @@
+import streamlit as st
+import pandas as pd
+import time 
+import matplotlib
+from PIL import Image
+import sklearn
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn import metrics
+from sklearn.metrics import classification_report, confusion_matrix,ConfusionMatrixDisplay, plot_confusion_matrix, cohen_kappa_score
+
+
+
+###############################
+
+# Create containers to give structure to the streamlit app
+header = st.container()
+alg = st.container()
+Table = st.container()
+
+
+with header:
+    #st.write("Hi class! Welcome to the presentation of group α")
+    st.header("Data Analytics and Machine Learning - Group α")
+    st.write("Group members: Büttner, Cedric; Ngo, Thi Ngoc Anh; Dao, Thi Huyen")
+    #st.write("Büttner, Cedric")
+    #st.write("Ngo, Thi Ngoc Anh")
+    #st.write("Dao, Thi Huyen")
+    st.title("Naïve Bayes for detecting breastcancer") # Header 
+    #image = Image.open('Unknown.jpeg')
+    #st.image(image, caption='Meme')#
+    
+    
+    # ML Algorithim
+with alg:
+
+    st.subheader ("Splitting the Dataset") # Subheader
+    # Slider!!!
+    my_range = range (10, 91,10) # Range and stepsize of the slider
+    number = st.select_slider("Choose a percentage.",options=my_range, value=30) # Slider
+    st.write(f'The test-size is {number}% of the original Data.')
+    
+    
+### This is the Naive Bayes Algorithim ###
+    data = load_breast_cancer() # Get the dataset
+    
+    # Modifiing#0,1#
+    data_frame = pd.DataFrame(data.data, columns = data.feature_names)
+    data_frame["label"] = data.target
+
+    
+
+    X, y = load_breast_cancer(return_X_y=True) # Labeling X and y axis
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=(number/100), random_state=0) # Split the dataset, into training and testing
+    gnb = GaussianNB() 
+    y_pred = gnb.fit(X_train, y_train).predict(X_test) # Run Gaussian Naive Bayes with training-dataset and predict with testing-dataset
+
+
+    st.subheader("Total mislabeled")
+    
+    # Mislabeled point
+    st.write("Number of mislabeled points out of a total %d points : %d"
+        % (X_test.shape[0], (y_test != y_pred).sum())) # Score. Count the total misslabled points
+
+##############################
+
+    #Confusion Matrix
+    st.subheader("Confusion Matrix")
+    prediction = gnb.predict(X_test) #Predict the response for test dataset
+    ConfusionMatrix=(confusion_matrix(y_test, prediction)) 
+    class_names = ["Malignant", "Benign"]
+    plot_confusion_matrix(gnb, X_test, y_test,display_labels=class_names)
+    st.pyplot()
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+
+
+    #Model Report
+    st.text('Model Report: \n '+ classification_report(y_test, prediction))
+
+    st.write("Cohen's Kappa core is: ",    sklearn.metrics.cohen_kappa_score(y_test, prediction).round(2)*100,('%'))
+  
+    # Shows Dataset
+with Table:
+    st.subheader("Dataset")
+    Checkbox = st.checkbox("Show Dataset")
+    
+
+ 
+    if Checkbox == False:
+        st.write("The Dataset is currently hidden. Check the box to unhide it.👆")
+    else:
+         st.write(data_frame)
+         st.write(data_frame.shape) # Show datase
+
+         st.bar_chart(data_frame["label"].value_counts())
+         st.write("0: Malignant")
+         st.write("1: Benign")
+
+
