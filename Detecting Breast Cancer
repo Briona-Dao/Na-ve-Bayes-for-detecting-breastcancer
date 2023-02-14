@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import time 
 import matplotlib
-from PIL import Image
 import sklearn
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
@@ -27,10 +26,7 @@ with header:
     #st.write("Büttner, Cedric")
     #st.write("Ngo, Thi Ngoc Anh")
     #st.write("Dao, Thi Huyen")
-    st.title("Naïve Bayes for detecting breastcancer") # Header 
-    #image = Image.open('Unknown.jpeg')
-    #st.image(image, caption='Meme')#
-    
+    st.title("Naïve Bayes for detecting breastcancer") # Header   
     
     # ML Algorithim
 with alg:
